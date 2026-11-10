@@ -1,0 +1,11 @@
+{
+  "tracking_quality": "WARNING",
+  "sampling_fps": 30.000003000000653,
+  "aliased_fraction": 0.9387308533916849,
+  "provenance": "raw omega_rad_s from tracker 2.csv; branch-dependent, may alias",
+  "source_observed_to_s": 30.4333333,
+  "extension": "constant omega after last measured sample, NOT an observation",
+  "valid_60_s_measurement": false,
+  "reason": "Original experiment has less than 60 seconds of tracking",
+  "tracker_aliased_in_fast_rotation": true
+}

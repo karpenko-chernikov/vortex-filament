@@ -1,0 +1,88 @@
+{
+  "experiment_label": "Distributed v4.2 | 60 s physical time | experimental drive with assumed extension",
+  "physical_time_s": 60.0,
+  "save_interval_s": 0.2,
+  "use_measured_rotation_input": true,
+  "input_mode": "speed_slip",
+  "run_convergence_series": true,
+  "continue_after_failed_case": true,
+  "parameters": {
+    "R": 0.04,
+    "H_water": 0.045,
+    "H_box": 0.09,
+    "rho_water": 998.0,
+    "rho_air": 1.2,
+    "mu_water": 0.001,
+    "mu_air": 1.81e-05,
+    "sigma": 0.072,
+    "g": 9.81,
+    "contact_angle_deg": 90.0,
+    "slip_length": 1e-05,
+    "torque": 0.002,
+    "force_r": 0.012,
+    "force_z": 0.004,
+    "drive_mode": "speed_slip",
+    "drive_profile": "inputs/omega_with_assumed_hold_to_60s.csv",
+    "drive_sign": 1.0,
+    "allow_unreliable_profile": 1,
+    "coupling_rate_s": 5.0,
+    "bar_radius": 0.012,
+    "bar_center_z": 0.003,
+    "bar_sigma_r": 0.003,
+    "bar_sigma_z": 0.002,
+    "z_refine_interface": 4.0,
+    "z_refine_width_m": 0.014,
+    "z_refine_bottom": 3.0,
+    "z_refine_bottom_width_m": 0.006,
+    "r_axis_refine": 3.0,
+    "r_wall_refine": 2.0,
+    "r_axis_width_m": 0.006,
+    "r_wall_width_m": 0.005,
+    "radial_stretch": 0.5,
+    "pressure_solver": "direct",
+    "phase_advection": "geometric",
+    "curvature_method": "adaptive_hf",
+    "angular_advection": "conservative",
+    "meridional_advection": "consistent",
+    "fail_graph_fraction_below": 0.98,
+    "fail_divergence_above": 1e-07,
+    "poisson_tol": 1e-08,
+    "poisson_maxiter": 1200,
+    "allow_unverified_bottom_contact": 0,
+    "fail_orphan_fraction_above": 0.0005
+  },
+  "grids": [
+    {
+      "name": "coarse_36x72",
+      "Nr": 36,
+      "Nz": 72,
+      "dt": 2e-05
+    },
+    {
+      "name": "medium_48x96",
+      "Nr": 48,
+      "Nz": 96,
+      "dt": 2e-05
+    },
+    {
+      "name": "fine_64x128",
+      "Nr": 64,
+      "Nz": 128,
+      "dt": 1e-05
+    }
+  ],
+  "quality_thresholds": {
+    "max_volume_drift": 1e-07,
+    "max_divergence_1_s": 1e-07,
+    "min_graph_columns_fraction": 0.98,
+    "target_spatial_relative_difference": 0.05,
+    "quasi_steady_window_s": 5.0,
+    "quasi_steady_relative_change": 0.02
+  },
+  "visualization": {
+    "max_animation_frames": 90,
+    "fps": 12,
+    "dpi": 180,
+    "preview_interval_s": 1.0
+  }
+}

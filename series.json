@@ -1,0 +1,36 @@
+{
+  "A": [
+    {
+      "name": "A01_H45_C3",
+      "H_water_m": 0.045,
+      "coupling_rate_s": 3.0
+    },
+    {
+      "name": "A02_H50_C5",
+      "H_water_m": 0.05,
+      "coupling_rate_s": 5.0
+    },
+    {
+      "name": "A03_H60_C3",
+      "H_water_m": 0.06,
+      "coupling_rate_s": 3.0
+    }
+  ],
+  "B": [
+    {
+      "name": "B01_H45_C5",
+      "H_water_m": 0.045,
+      "coupling_rate_s": 5.0
+    },
+    {
+      "name": "B02_H50_C3",
+      "H_water_m": 0.05,
+      "coupling_rate_s": 3.0
+    },
+    {
+      "name": "B03_H60_C5",
+      "H_water_m": 0.06,
+      "coupling_rate_s": 5.0
+    }
+  ]
+}

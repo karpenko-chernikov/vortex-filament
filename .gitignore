@@ -1,0 +1,7 @@
+.venv_v42/
+__pycache__/
+*.pyc
+results_*/
+.vof_slots/
+.DS_Store
+*.tmp
