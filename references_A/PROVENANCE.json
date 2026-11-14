@@ -1,0 +1,26 @@
+[
+  {
+    "participant": "C",
+    "origin": "A03_H60_C3/results_v42/cases/fine_64x128/segment_001/snapshot_6000000.npz",
+    "file": "C_A_64x128_60s.npz",
+    "sha256": "a1a4205c91642dee8fc33adb7bd8edcb23dcae2c6cd3084469ed4a9d1d85ab62",
+    "H_water_m": 0.06,
+    "coupling_rate_s": 3.0,
+    "dt_s": 1e-05,
+    "Nr": 64,
+    "Nz": 128,
+    "physical_time_s": 60.0
+  },
+  {
+    "participant": "D",
+    "origin": "A01_H45_C3/results_v42/cases/fine_64x128/segment_001/snapshot_6000000.npz",
+    "file": "D_A_64x128_60s.npz",
+    "sha256": "4deee3d9cacb5e3316be26ba91c1cacd99479c66b3242ff25107aa12affb59ee",
+    "H_water_m": 0.045,
+    "coupling_rate_s": 3.0,
+    "dt_s": 1e-05,
+    "Nr": 64,
+    "Nz": 128,
+    "physical_time_s": 60.0
+  }
+]

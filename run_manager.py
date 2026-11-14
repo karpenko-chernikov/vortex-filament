@@ -427,7 +427,8 @@ def collect_summary(config):
     entries=[]
     for g in config['grids']:
         entries.append(status_for(RESULTS/'cases'/g['name'],g['name']))
-    complete=all(x.get('execution')=='COMPLETE' for x in entries)
+    target=float(config['physical_time_s'])
+    complete=all(x.get('execution')=='COMPLETE' and float(x.get('physical_time_reached_s') or 0)>=target-1e-9 for x in entries)
     passed=complete and all(x.get('numerical_qc')=='PASS' for x in entries)
     summary={'timestamp_utc':datetime.now(timezone.utc).isoformat(),
              'physical_target_s':config['physical_time_s'],
@@ -505,6 +506,8 @@ def _restore_case_phases(cfg):
 
 def main():
     arg=argparse.ArgumentParser();arg.add_argument('--mode',choices=['full','smoke','analyze'],default='full')
+    arg.add_argument('--no-artifacts',action='store_true')
+    arg.add_argument('--grid-only',default=None)
     arg.add_argument('--retry-failed',action='store_true');a=arg.parse_args()
     os.environ.setdefault('VOF_WORKERS', str(os.cpu_count() or 1))
     os.environ.setdefault('VOF_SLOT_DIR', str(ROOT/'.vof_slots'))
@@ -522,7 +525,10 @@ def main():
         print('[FAILED] SMOKE TEST',flush=True);return 2
     if a.mode=='full':
         from concurrent.futures import ThreadPoolExecutor
-        grids=cfg['grids']
+        grids=[g for g in cfg['grids'] if a.grid_only is None or g['name']==a.grid_only]
+        if not grids:
+            print('[FAILED] Unknown --grid-only target:',a.grid_only,flush=True)
+            return 2
         print(f'[RUN] Сетки этой серии считаются параллельно. На машине одновременно до {worker_count()} расчётов. Схема, сетки и dt не меняются.',flush=True)
         if len(grids)==1:
             run_case(cfg,grids[0],retry_failed=a.retry_failed)
@@ -531,25 +537,29 @@ def main():
                 futures=[pool.submit(run_case, cfg, g, smoke=False, retry_failed=a.retry_failed) for g in grids]
                 for fut in futures:
                     fut.result()
-    def notify_analysis():
-        stamp_cases(cfg, 'ждёт постобработку, процесс жив')
-    notify_analysis()
-    analysis_slot=wait_for_slot('analysis', 1, notify_analysis, 15)
-    stop_pulse=threading.Event()
-    def pulse():
-        while not stop_pulse.wait(15):
-            stamp_cases(cfg, 'постобработка, процесс жив')
-    pulse_thread=threading.Thread(target=pulse, daemon=True)
-    stamp_cases(cfg, 'постобработка, процесс жив')
-    pulse_thread.start()
-    try:
-        analyze_rc=run_analysis()
-    finally:
-        stop_pulse.set()
-        pulse_thread.join(timeout=1)
-        _unlock(analysis_slot)
-        if a.mode=='full':
-            _restore_case_phases(cfg)
+    analyze_rc=0
+    if not a.no_artifacts:
+        def notify_analysis():
+            stamp_cases(cfg, 'ждёт постобработку, процесс жив')
+        notify_analysis()
+        analysis_slot=wait_for_slot('analysis', 1, notify_analysis, 15)
+        stop_pulse=threading.Event()
+        def pulse():
+            while not stop_pulse.wait(15):
+                stamp_cases(cfg, 'постобработка, процесс жив')
+        pulse_thread=threading.Thread(target=pulse, daemon=True)
+        stamp_cases(cfg, 'постобработка, процесс жив')
+        pulse_thread.start()
+        try:
+            analyze_rc=run_analysis()
+        finally:
+            stop_pulse.set()
+            pulse_thread.join(timeout=1)
+            _unlock(analysis_slot)
+            if a.mode=='full':
+                _restore_case_phases(cfg)
+    elif a.mode=='full':
+        _restore_case_phases(cfg)
     summary=collect_summary(cfg)
     
     conv=RESULTS/'analysis/convergence_status.json'
@@ -558,15 +568,25 @@ def main():
         except Exception: pass
     write_json(RESULTS/'STATUS.json',summary)
     write_report(summary)
-    package_results()
+    if not a.no_artifacts: package_results()
     print('\n========== FINAL STATUS ==========',flush=True)
     for item in summary['cases']:
         print(f"[{item.get('execution','NOT_STARTED')}] {item['case']}: t={item.get('physical_time_reached_s',0):.4f}s QC={item.get('numerical_qc','UNKNOWN')}",flush=True)
     print('SPATIAL CONVERGENCE:',summary['spatial_convergence'],flush=True)
     print('EXPERIMENTAL VALIDATION: NOT ESTABLISHED (experimental surface and liquid velocities missing)',flush=True)
+    if a.grid_only is not None and a.no_artifacts:
+        chosen=next((x for x in summary['cases'] if x['case']==a.grid_only),{})
+        if chosen.get('execution')=='COMPLETE' and chosen.get('numerical_qc')=='PASS' and float(chosen.get('physical_time_reached_s') or 0)>=float(cfg['physical_time_s'])-1e-9:
+            print('[OK] Selected grid complete, numerical QC PASS.',flush=True)
+            return 0
+        print('[FAILED] Selected grid failed or not complete.',flush=True)
+        return 2
     if not summary['all_grid_executions_complete'] or not summary['all_grid_numerical_checks_pass']:
         print('[FAILED] The 60-second campaign is incomplete or violates numerical QC.',flush=True);return 2
     if analyze_rc!=0:print('[FAILED] Scientific postprocessing did not finish.',flush=True);return 3
+    if a.no_artifacts:
+        print('[OK] All requested grids reached the target; detailed convergence evaluated by the CD campaign.',flush=True)
+        return 0
     if summary['spatial_convergence']!='PASS':
         print('[WARNING] Computations complete; spatial convergence is not established.',flush=True)
         return 4

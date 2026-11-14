@@ -818,7 +818,6 @@ def format_progress_line(payload):
 
 
 class ProgressReporter:
-    """Пишет пульс расчёта, не участвуя в схеме. Шаг, сетка и допуски не меняются."""
 
     def __init__(self, cfg, path, nsteps, nstart):
         self.cfg=cfg
@@ -835,7 +834,7 @@ class ProgressReporter:
         self.series='?'
         self.case=self.path.parent.name
         for part in self.path.parts:
-            if len(part)>=3 and part[0] in 'AB' and part[1:3].isdigit():
+            if len(part)>=3 and part[0] in 'ABCD' and part[1:3].isdigit():
                 self.series=part
         self.thread=threading.Thread(target=self._loop, name='vof-progress', daemon=True)
 

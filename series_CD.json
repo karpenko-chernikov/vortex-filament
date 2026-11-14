@@ -1,0 +1,12 @@
+{
+  "C": [
+    {"name": "C01_H60_L3_dt20", "H_water_m": 0.060, "coupling_rate_s": 3.0, "dt_us": 20},
+    {"name": "C02_H60_L3_dt10", "H_water_m": 0.060, "coupling_rate_s": 3.0, "dt_us": 10},
+    {"name": "C03_H60_L3_dt05", "H_water_m": 0.060, "coupling_rate_s": 3.0, "dt_us": 5}
+  ],
+  "D": [
+    {"name": "D01_H45_L3_dt20", "H_water_m": 0.045, "coupling_rate_s": 3.0, "dt_us": 20},
+    {"name": "D02_H45_L3_dt10", "H_water_m": 0.045, "coupling_rate_s": 3.0, "dt_us": 10},
+    {"name": "D03_H45_L3_dt05", "H_water_m": 0.045, "coupling_rate_s": 3.0, "dt_us": 5}
+  ]
+}
